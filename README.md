@@ -1,15 +1,16 @@
-# metaverse-js-centralized
+# metaverse-socket.io-p2p
 Networked A-Frame worlds [A-Frame](https://aframe.io/). I am in the middle of cleaning up this repo
 
-WebSocket wrapper: 
-- Socket.io https://github.com/socketio/socket.io
+WebSocket wrapper:
+- Socket.io-p2p https://github.com/socketio/socket.io-p2p
 
 ## How to run:
 
 1. `npm install` You may need some dependencies I don't remember for the IPFS security libs, but it should be apparent in install
-2. `npm start`
-3. Connect to http://localhost:3003 in two different browser windows. Usually this would be over an HTTPS connection so you have to allow non-secure connection
-4. You should be able to see interactions visible in both windows
+2. Rewrite IP address to yours in `src/app.js`
+3. `npm start`
+4. Connect to `http://<IP>:3003` in two different browser windows. Usually this would be over an HTTPS connection so you have to allow non-secure connection
+5. You should be able to see interactions visible in both windows
 
 ## UI:
 

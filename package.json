@@ -1,7 +1,7 @@
 {
-  "name": "metaverse-js-centralized",
+  "name": "metaverse-socketio-p2p",
   "version": "0.0.1",
-  "description": "Metaverse JS Centralized",
+  "description": "Metaverse JS Socket.io P2P",
   "main": "server.js",
   "scripts": {
     "start": "browserify src/app.js -o public/js/app.js -d & node server.js"
