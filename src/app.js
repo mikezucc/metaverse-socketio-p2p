@@ -14,6 +14,38 @@ window.onload = function() {
   var k_SOCKET_ENDPOINT_PUBLIC_OSIRIS = "ws://67.169.94.129:3003"
   var socket = io(k_SOCKET_ENDPOINT_PUBLIC_OSIRIS)
 
+  var P2PModule = require('socket.io-p2p');
+
+  var opts = {peerOpts: {trickle: false}, autoUpgrade: false};
+  var p2p = new P2PModule(socket, opts, function(data) {
+    console.log("[SOCKET.IO-P2P] p2p socket callback");
+    console.log(data);
+    p2p.emit('peer-obj', 'Hello there. I am ' + p2p.peerId)
+  });
+
+  p2p.on('ready', function(){
+    console.log("[SOCKET.IO-P2P] READY");
+    p2p.useSockets = false;
+    p2p.emit('peer-obj', { peerId: peerId });
+  })
+
+  // this event will be triggered over the socket transport
+  // until `usePeerConnection` is set to `true`
+  p2p.on('peer-msg', function(data){
+    console.log("[SOCKET.IO-P2P] connection established");
+    console.log(data);
+  });
+
+  p2p.on('go-private', function () {
+    console.log("[SOCKET.IO-P2P] GO PRIVATE");
+    goPrivate()
+  })
+
+  function goPrivate () {
+    p2p.useSockets = false
+    console.log('SOCKET.IO-P2P] WebRTC connection established!')
+  }
+
   // Avatar connected to Swarm! Initiate other p2p experiences
   socket.on("server-ack-connect", function (data) {
     console.log("[SOCKET.IO] > server ack > ");
@@ -33,7 +65,7 @@ window.onload = function() {
 
   socket.on('avatar-disconnect', function(info) {
     var peerid = info["socket_id"];
-    console.log("IPFS PUBSUB ROOM >> LEFT >> " + peerid );
+    console.log("LEFT >> " + peerid );
     var peerBox = document.getElementById('box' + peerid);
     if (peerBox) {
       var position = peerBox.getAttribute('position');
@@ -77,7 +109,7 @@ window.onload = function() {
     document.getElementById('speechoutput').innerHTML = populationString;
   })
 
-  socket.on('avatar-datagram', function (datagram) {
+  p2p.on('avatar-datagram', function (datagram) {
     for (var reportedAvatarMetadata in datagram) {
       console.log(reportedAvatarMetadata);
       var metadata = JSON.parse(datagram[reportedAvatarMetadata]);
@@ -350,7 +382,7 @@ window.onload = function() {
       // console.log(position);
       lastRotation = rotation;
       lastPosition = position;
-      socket.emit("avatar-datagram", JSON.stringify({ "socket_id": socket.id, 'type':'dg', 'position': position, 'rotation':rotation }));
+      p2p.emit("peer-msg", JSON.stringify({ "socket_id": socket.id, 'type':'dg', 'position': position, 'rotation':rotation }));
       if (position.x < 0) {
         position.x = -position.x;
       }
